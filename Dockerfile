@@ -7,13 +7,13 @@ ENV DEBIAN_FRONTEND noninteractive
 VOLUME /dev/vboxdrv
 
 RUN apt-get update
-RUN apt-get -y install curl
+RUN apt-get -y install curl wget
 
 # Install VirtualBox
 RUN curl https://www.virtualbox.org/download/oracle_vbox_2016.asc | apt-key add -
 RUN sh -c 'echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list.d/virtualbox.list'
 RUN apt-get update
-RUN apt-get install -y virtualbox-5.0 wget
+RUN apt-get install -y virtualbox-5.0
 
 # Install Virtualbox Extension Pack
 RUN VBOX_VERSION=`dpkg -s virtualbox-5.0 | grep '^Version: ' | sed -e 's/Version: \([0-9\.]*\)\-.*/\1/'` ; \
