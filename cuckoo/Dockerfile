@@ -94,4 +94,4 @@ EXPOSE 80
 
 # ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["/usr/bin/supervisord"]
+#CMD ["/usr/bin/supervisord"]
