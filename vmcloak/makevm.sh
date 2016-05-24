@@ -1,26 +1,19 @@
 #!/bin/bash
 set -xe
 
-if [[ -z $1 ]] || [[ -z $2 ]] || [[ -z $3 ]]; then
-	echo "Usage: makevm.sh <name> <iso> <serial> <ip> <gateway>"
+if [[ -z "$5" ]]; then
+	echo "Usage: $0 <name> <osversion> <iso> <serial> <ip-last-octet>"
+	echo "Where osversion is one of: winxp win7 win7x64"
 	exit
 fi
 
-# Directory where virtual machine will be stored, snapshots etc.
-# This could be stored in tmpfs to gain additional speed
-VMDIR=/mnt/vmcloak/vm
-
-# Directory where hard disk images are stored
-DATADIR=/mnt/vmcloak/data
-
-ISODIR=/mnt/vmcloak/iso
+ISODIR=/mnt/isos
 
 NAME="$1"
-ISO=$ISODIR/"$2"
-SERIAL="$3"
-IP="$4"
-GW="$5"
-
+VER="$2"
+ISO=$ISODIR/"$3"
+SERIAL="$4"
+IP="$5"
 
 ISO_MNT=`mktemp -d`
 
@@ -30,6 +23,6 @@ if [[ $? -ne 0 ]]; then
 	exit
 fi
 
-vmcloak-init --winxp --iso-mount $ISO_MNT --serial-key $SERIAL $NAME
+vmcloak-init --$VER --iso-mount $ISO_MNT --serial-key $SERIAL --ip 172.28.128.$IP --gateway 172.28.128.1 $NAME
 
 umount $ISO_MNT
