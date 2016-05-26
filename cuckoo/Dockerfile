@@ -66,35 +66,27 @@ RUN echo "Install ssdeep..." \
   && python setup.py build \
   && python setup.py install
 
+RUN apt-get install -y python-psycopg2 ipython
+RUN /usr/local/bin/pip install mitmproxy vmcloak
+
+# git clone https://github.com/HarryR/cuckoo.git --branch bugfixes --single-branch /cuckoo \
+# chown -R cuckoo:cuckoo /cuckoo \
+
+COPY cuckoo /cuckoo/
+
 RUN echo "Cloning Cuckoo Sandbox..." \
-  && git clone https://github.com/HarryR/cuckoo.git --branch conf-env --single-branch /cuckoo \
   && groupadd cuckoo \
   && useradd --create-home --home-dir /home/cuckoo -g cuckoo cuckoo \
-  && chown -R cuckoo:cuckoo /cuckoo \
   && cd /cuckoo \
-  && echo "Upgrade pip and install pip dependencies..." \  
-  && /usr/local/bin/pip install mitmproxy \
+  && echo "Upgrade pip and install pip dependencies..." \
   && /usr/local/bin/pip install -r requirements.txt \
   && python utils/community.py -waf
-
-# Other stuff...
-RUN apt-get install -y python-psycopg2 ipython
 
 RUN echo "Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/lib/mongodb
 
-# COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-# COPY conf/reporting.conf /cuckoo/conf/reporting.conf
-# COPY docker-entrypoint.sh /entrypoint.sh
-
 VOLUME ["/cuckoo/conf", "/root/.vmcloak"]
 
 WORKDIR /cuckoo
-
-#EXPOSE 80
-
-# ENTRYPOINT ["/entrypoint.sh"]
-
-#CMD ["/usr/bin/supervisord"]

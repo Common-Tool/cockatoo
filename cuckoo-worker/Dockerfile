@@ -6,7 +6,16 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK on
 
 COPY conf/reporting.conf /cuckoo/conf/reporting.conf
 COPY conf/cuckoo.conf /cuckoo/conf/cuckoo.conf
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY conf/virtualbox.conf /cuckoo/conf/virtualbox.conf
+
+COPY supervisord.conf /etc/supervisor/conf.d/cuckoo.conf
+
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+EXPOSE 8090
+EXPOSE 2042
 
 CMD ["/usr/bin/supervisord"]
 
