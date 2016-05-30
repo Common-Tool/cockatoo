@@ -26,28 +26,8 @@ OS's, it will work with recent versions of Debian, and with some extra effort
 should work on RHEL, Alpine etc. If you still use Slackware, I'm sorry, but you 
 have much bigger problems to worry about first.
 
-Installation directory structure:
-
-* `/cockatoo`
-	- `src` - Cockatoo repository
-	- `isos` - Contains OS ISO images for vmcloak
-	- `data` (auto created)
-		- `vmcloak` - Persistent vmcloak data (built VMs) (auto-created)
-		- `worker-vms` - VM snapshots used by cuckoo worker (auto-created)
-		- `worker-storage` - Worker results storage directory (auto-created)
-		- `dist-pgdata` - Cuckoo Dist PostgreSQL data (auto-created)
-
-First, setup the `/cockatoo` directory, as `root`, with:
-
-	sudo -i
-	mkdir /cockatoo && cd /cockatoo
-	git clone https://github.com/HarryR/cockatoo src
-	mkdir isos
-	cd isos && wget http://torrents.example.com/winxp.iso
-
-Then, still as `root`, install prerequesites (VirtualBox, Docker etc.) and build the
-containers with:
-
+	git clone https://github.com/HarryR/cockatoo
+	wget -O isos/winxp.iso http://torrents.example.com/winxp.iso
 	make -C /cockatoo/src prereq build
 
 The full build process will take 10 minutes to an hour+ depending on your
@@ -57,7 +37,7 @@ everything necessary to build VMS, run Cuckoo and start analysing malware.
 So, lets build a Windows XP base image using the ISO you pirated^H^H^H stole 
 from your grandma and a serial key you found underneath a friends laptop.
 
-	make -C /cockatoo/src run-vmcloak
+	make run-vmcloak
 	$ /root/makevm.sh winxp32-base winxp winxp.iso B6VT6-VY6DP-VXD7G-...
 
 ## Useful Links

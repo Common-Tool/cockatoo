@@ -1,7 +1,8 @@
 ROOT_DIR = $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-DATA_DIR = $(ROOT_DIR)/../data/
+DATA_DIR = $(ROOT_DIR)/data/
+CONF_DIR = $(ROOT_DIR)/conf/
 
-VMCLOAK_ISOS_DIR=$(ROOT_DIR)/../isos
+VMCLOAK_ISOS_DIR=$(ROOT_DIR)/isos
 VMCLOAK_PERSIST_DIR=$(DATA_DIR)/vmcloak
 WORKER_STORAGE_DIR=$(DATA_DIR)/worker-storage
 WORKER_VMS_DIR=$(DATA_DIR)/worker-vms
@@ -41,29 +42,32 @@ $(PGDATA_WORKER_DIR): $(DATA_DIR)
 $(PGDATA_DIST_DIR): $(DATA_DIR)
 	mkdir -p $@
 
+cleandata:
+	rm -f $(VMCLOAK_PERSIST_DIR) $(WORKER_STORAGE_DIR) $(WORKER_VMS_DIR) $(PGDATA_WORKER_DIR) $(PGDATA_DIST_DIR)
+
 .PHONY: vmcloak
 vmcloak:
-	cd $@ && docker build -t $(DOCKER_BASETAG):$@ .
+	cd src/$@ && docker build -t $(DOCKER_BASETAG):$@ .
 
 .PHONY: virtualbox5
 virtualbox5:
-	cd $@ && docker build -t $(DOCKER_BASETAG):$@ .
+	cd src/$@ && docker build -t $(DOCKER_BASETAG):$@ .
 
 .PHONY: cuckoo
 cuckoo: virtualbox5
-	cd $@ && docker build -t $(DOCKER_BASETAG):$@ .
+	cd src/$@ && docker build -t $(DOCKER_BASETAG):$@ .
 
 .PHONY: postgresql
 postgresql:
-	cd $@ && docker build -t $(DOCKER_BASETAG):$@ .
+	cd src/$@ && docker build -t $(DOCKER_BASETAG):$@ .
 
 .PHONY: cuckoo-worker
 cuckoo-worker: cuckoo
-	cd $@ && docker build -t $(DOCKER_BASETAG):$@ .
+	cd src/$@ && docker build -t $(DOCKER_BASETAG):$@ .
 
 .PHONY: cuckoo-dist
 cuckoo-dist: cuckoo
-	cd $@ && docker build -t $(DOCKER_BASETAG):$@ .
+	cd src/$@ && docker build -t $(DOCKER_BASETAG):$@ .
 
 .PHONY: prereq-docker
 prereq-docker:
@@ -83,7 +87,6 @@ prereq:	prereq-virtualbox prereq-docker
 
 .PHONY: build
 build: virtualbox5 cuckoo cuckoo-worker cuckoo-dist postgresql
-
 
 # Start a shell in the vmcloak container
 run-vmcloak: vmcloak  $(VMCLOAK_PERSIST_DIR)
