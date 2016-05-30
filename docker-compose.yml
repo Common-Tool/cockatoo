@@ -12,7 +12,7 @@ services:
     devices:
       - "/dev/vboxdrv:/dev/vboxdrv"
     build:
-      context: ./cuckoo-worker
+      context: ./src/cuckoo-worker
     image: harryr/cockatoo:cuckoo-worker
     ports:
       - "8090:8090"
@@ -34,7 +34,7 @@ services:
     depends_on:
       - cuckoo-dist-db
     build:
-      context: ./cuckoo-dist
+      context: ./src/cuckoo-dist
     image: harryr/cockatoo:cuckoo-dist
     ports:
       - "9003:9003"
@@ -50,7 +50,7 @@ services:
     #  driver: syslog
     restart: always
     build:
-      context: ./postgresql
+      context: ./src/postgresql
     image: harryr/cockatoo:postgresql
     ports:
       - "5432:5432"
