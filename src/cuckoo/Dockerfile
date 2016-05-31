@@ -80,6 +80,7 @@ RUN echo "Cloning Cuckoo Sandbox..." \
   && cd /cuckoo \
   && echo "Upgrade pip and install pip dependencies..." \
   && /usr/local/bin/pip install -r requirements.txt \
+  && /usr/local/bin/pip install -r distributed/requirements.txt \
   && python utils/community.py -waf
 
 RUN echo "Clean up unnecessary files..." \

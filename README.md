@@ -71,6 +71,12 @@ IP addresses:
  * `vboxnet0` - `172.28.128.1/24`
  * Cuckoo guest VMs - `172.28.128.100+`
 
+Ports:
+
+ * 9003 - Cuckoo Distributed API
+ * 2042 - Cuckoo Worker Reporting Server
+ * 8090 - Cuckoo Worker API
+
 ## Useful Links
 
  * http://vmcloak.org/
