@@ -21,16 +21,16 @@ report_formats = "json"
 pcap = True
 
 # Directory for storing samples as long as their task is available.
-samples_directory = "/tmp"
+samples_directory = "/mnt/samples/"
 
 # Directory for storing reports as long as their task is available.
-reports_directory = "/tmp"
+reports_directory = "/mnt/reports/"
 
 # Rough interval between each status checkup per Cuckoo node. As it's not
 # necessary to check the status every second half a minute should do.
-interval = 10
+interval = 30
 
 # Threshold and amount of tasks to push every time a Cuckoo node requires
 # more samples. That is, whenever the "pending" task count drops below
 # "threshold" tasks, "threshold" tasks are submitted to the node.
-threshold = 10
+threshold = 20

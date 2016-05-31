@@ -11,6 +11,7 @@ COPY conf/virtualbox.conf /cuckoo/conf/virtualbox.conf
 COPY supervisord.conf /etc/supervisor/conf.d/cuckoo.conf
 
 COPY docker-entrypoint.sh /
+COPY cuckoo-api-wrapper.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

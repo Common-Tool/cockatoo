@@ -4,9 +4,11 @@ RUN_DIR = $(ROOT_DIR)/run/
 
 VMCLOAK_ISOS_DIR=$(ROOT_DIR)/isos
 VMCLOAK_PERSIST_DIR=$(DATA_DIR)/vmcloak
-PGDATA_WORKER_DIR=$(DATA_DIR)/worker-pgdata
+DIST_SAMPLES_DIR=$(DATA_DIR)/samples/
+DIST_REPORTS_DIR=$(DATA_DIR)/reports/
 PGDATA_DIST_DIR=$(DATA_DIR)/dist-pgdata
 DOCKER_BASETAG=harryr/cockatoo
+#PGDATA_WORKER_DIR=$(DATA_DIR)/worker-pgdata
 
 all:
 	@echo "See README.md for information on how to get started"
@@ -17,8 +19,11 @@ $(RUN_DIR)/pgpass:
 
 # Create single file containing all environment segments
 $(RUN_DIR)/env: $(RUN_DIR)/pgpass
+	echo "" > $@
 	echo -n 'POSTGRES_PASSWORD=' >> $@ && cat $(RUN_DIR)/pgpass >> $@
-	echo 'CUCKOO_WORKER_DSN=' >> $@
+	echo 'CUCKOO_DIST_API=http://127.0.0.1:9003' >> $@
+
+env: $(RUN_DIR)/env
 
 $(VMCLOAK_ISOS_DIR):
 	mkdir -p $@
@@ -29,17 +34,20 @@ $(WORKER_STORAGE_DIR):
 $(VMCLOAK_PERSIST_DIR):
 	mkdir -p $@
 
+$(DIST_SAMPLES_DIR):
+	mkdir -p $@
+
+$(DIST_REPORTS_DIR):
+	mkdir -p $@
+
 $(WORKER_VMS_DIR):
 	mkdir -p $@
 
-$(PGDATA_WORKER_DIR):
-	mkdir -p $@
+#$(PGDATA_WORKER_DIR):
+#	mkdir -p $@
 
 $(PGDATA_DIST_DIR):
 	mkdir -p $@
-
-cleandata:
-	rm -f $(VMCLOAK_PERSIST_DIR) $(WORKER_STORAGE_DIR) $(WORKER_VMS_DIR) $(PGDATA_WORKER_DIR) $(PGDATA_DIST_DIR)
 
 .PHONY: vmcloak
 vmcloak:
@@ -108,12 +116,12 @@ run-vmcloak: vmcloak  $(VMCLOAK_PERSIST_DIR)
 	docker run -h vmcloak --net=host --privileged -v $(VMCLOAK_PERSIST_DIR):/root/.vmcloak/ -v /dev/vboxdrv:/dev/vboxdrv -v $(VMCLOAK_ISOS_DIR):/mnt/isos -ti harryr/cockatoo:vmcloak bash
 
 run-cuckoo-worker: $(RUN_DIR)/env pre-run
-	docker rm cuckoo-worker
-	docker run --name cuckoo-worker -h cuckoo-worker --env-file=$(RUN_DIR)/env --net=host --privileged --cap-add net_admin -v /cuckoo/storage/ -v $(VMCLOAK_PERSIST_DIR):/root/.vmcloak/ -v /root/.vmcloak/vms/ -v /dev/vboxdrv:/dev/vboxdrv harryr/cockatoo:cuckoo-worker
+	docker rm cuckoo-worker || true
+	docker run --name cuckoo-worker --env-file=$(RUN_DIR)/env --net=host --privileged --cap-add net_admin -v /cuckoo/storage/ -v $(VMCLOAK_PERSIST_DIR):/root/.vmcloak/ -v /root/.vmcloak/vms/ -v /dev/vboxdrv:/dev/vboxdrv -t harryr/cockatoo:cuckoo-worker
 
-run-cuckoo-dist-api: $(RUN_DIR)/env
-	docker rm cuckoo-dist-api
-	docker run --name cuckoo-dist-api -h cuckoo-dist-api -p 9003:9003 --link cuckoo-dist-db:db --env-file=$(RUN_DIR)/env -v $(VMCLOAK_PERSIST_DIR):/root/.vmcloak/ harryr/cockatoo:cuckoo-dist
+run-cuckoo-dist-api: $(RUN_DIR)/env $(DIST_SAMPLES_DIR) $(DIST_REPORTS_DIR)
+	docker rm cuckoo-dist-api || true
+	docker run --name cuckoo-dist-api -h cuckoo-dist-api -p 9003:9003 --link cuckoo-dist-db:db --env-file=$(RUN_DIR)/env -v $(VMCLOAK_PERSIST_DIR):/root/.vmcloak/ -v $(DIST_REPORTS_DIR):/mnt/reports -v $(DIST_SAMPLES_DIR):/mnt/samples harryr/cockatoo:cuckoo-dist
 
 # Start the Cuckoo Worker PostgreSQL container
 #run-cuckoo-worker-db: postgresql $(PGDATA_WORKER_DIR) $(RUN_DIR)/pgpass
@@ -121,5 +129,5 @@ run-cuckoo-dist-api: $(RUN_DIR)/env
 
 # Start the Cuckoo Dist Server PostgreSQL container
 run-cuckoo-dist-db: $(PGDATA_DIST_DIR) $(RUN_DIR)/env
-	docker rm cuckoo-dist-db
+	docker rm cuckoo-dist-db || true
 	docker run --name cuckoo-dist-db -h cuckoo-dist-db -p 5432:5432 --env-file=$(RUN_DIR)/env -v $(PGDATA_DIST_DIR):/var/lib/postgresql/data/ harryr/cockatoo:postgresql
