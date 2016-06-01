@@ -19,6 +19,3 @@ EXPOSE 8090
 EXPOSE 2042
 
 CMD ["/usr/bin/supervisord"]
-
-# RUN apt-get install uwsgi uwsgi-plugin-python nginx
-

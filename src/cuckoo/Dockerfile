@@ -76,7 +76,8 @@ COPY cuckoo /cuckoo/
 
 RUN echo "Cloning Cuckoo Sandbox..." \
   && groupadd cuckoo \
-  && useradd --create-home --home-dir /home/cuckoo -g cuckoo cuckoo \
+  && useradd -d /cuckoo -M -g cuckoo cuckoo \
+  && useradd -d /cuckoo -M -g cuckoo cuckoo-run \
   && cd /cuckoo \
   && echo "Upgrade pip and install pip dependencies..." \
   && /usr/local/bin/pip install -r requirements.txt \

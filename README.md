@@ -77,6 +77,15 @@ Ports:
  * 2042 - Cuckoo Worker Reporting Server
  * 8090 - Cuckoo Worker API
 
+## TODO / Maybe / Ideas etc.
+
+ * Speed up startup of cuckoo worker (specifically the VM import!)
+ * More reliable start/stop mechanism
+ * Replace supervisor with something that manages dependencies + delays
+ * Better logging management, hierarchical?
+ * Tighter security + protection
+ * All roads point to `systemd` ....
+
 ## Useful Links
 
  * http://vmcloak.org/
