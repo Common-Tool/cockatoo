@@ -11,7 +11,7 @@ fi
 # Initially background the API, then register with Distributed API
 /usr/bin/python /cuckoo/utils/api.py -H 0.0.0.0 &
 echo $? > /tmp/cuckoo-api.pid
-sleep 2
+sleep 5
 RES=`curl $CUCKOO_DIST_API/api/node -F name=$HOSTNAME -F url=http://$MYIP:8090/ | sed ':a;N;$!ba;s/\n/ /g'`
 echo $RES | grep 'There is already a node' &> /dev/null
 if [[ $? -eq 0 ]]; then

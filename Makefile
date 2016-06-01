@@ -19,11 +19,12 @@ $(RUN_DIR)/pgpass:
 	openssl rand -base64 15 | tr -cd '[:alnum:]\n' > $@
 
 # Create single file containing all environment segments
+.PHONY: $(RUN_DIR)/env
 $(RUN_DIR)/env: $(RUN_DIR)/pgpass
-	echo '' > $@
-	echo -n 'POSTGRES_PASSWORD=' >> $@ && cat $(RUN_DIR)/pgpass >> $@
-	echo 'CUCKOO_DIST_API=http://127.0.0.1:9003' >> $@
-	echo MYIP=$(MYIP) >> $@
+	@echo '' > $@
+	@echo -n 'POSTGRES_PASSWORD=' >> $@ && cat $(RUN_DIR)/pgpass >> $@
+	@echo 'CUCKOO_DIST_API=http://127.0.0.1:9003' >> $@
+	@echo MYIP=$(MYIP) >> $@
 
 env: $(RUN_DIR)/env
 
