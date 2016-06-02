@@ -10,6 +10,7 @@ PGDATA_DIST_DIR=$(DATA_DIR)/dist-pgdata
 DOCKER_BASETAG=harryr/cockatoo
 #PGDATA_WORKER_DIR=$(DATA_DIR)/worker-pgdata
 MYIP := $(shell src/utils/myip.sh)
+MEM_TOTAL=$(shell cat /proc/meminfo | grep MemTotal | awk '{print $$2}')
 
 all:
 	@echo "See README.md for information on how to get started"
@@ -25,6 +26,8 @@ $(RUN_DIR)/env: $(RUN_DIR)/pgpass
 	@echo -n 'POSTGRES_PASSWORD=' >> $@ && cat $(RUN_DIR)/pgpass >> $@
 	@echo 'CUCKOO_DIST_API=http://127.0.0.1:9003' >> $@
 	@echo MYIP=$(MYIP) >> $@
+	@echo CPU_COUNT=`cat /proc/cpuinfo  | grep bogomips | wc -l` >> $@
+	@echo MAX_VMS=$$(( $(MEM_TOTAL) / 1024 / 1024)) >> $@
 
 env: $(RUN_DIR)/env
 
@@ -101,9 +104,9 @@ build: virtualbox5 cuckoo cuckoo-worker cuckoo-dist postgresql
 # This ensures that vboxnet0 is up and has a known IP / subnet
 .PHONY: pre-run
 pre-run:
-	sudo vboxmanage list hostonlyifs > /dev/null
-	sudo vboxmanage hostonlyif ipconfig vboxnet0 --ip 172.28.128.1
-	sudo vboxmanage dhcpserver remove --ifname vboxnet0 || true
+	vboxmanage list hostonlyifs > /dev/null
+	vboxmanage hostonlyif ipconfig vboxnet0 --ip 172.28.128.1
+	vboxmanage dhcpserver remove --ifname vboxnet0 || true
 
 .PHONY: run
 run: pre-run

@@ -15,7 +15,7 @@ SQLALCHEMY_DATABASE_URI = "postgresql://postgres:%s@%s/postgres" % (environ.get(
 SECRET_KEY = urandom(32)
 
 # A list of reporting formats, e.g., json.
-report_formats = "json"
+report_formats = ["json"]
 
 # Fetch the pcap?
 pcap = True

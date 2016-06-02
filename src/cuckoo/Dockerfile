@@ -72,22 +72,24 @@ RUN /usr/local/bin/pip install mitmproxy vmcloak
 # git clone https://github.com/HarryR/cuckoo.git --branch bugfixes --single-branch /cuckoo \
 # chown -R cuckoo:cuckoo /cuckoo \
 
+COPY cuckoo/requirements.txt /tmp/cuckoo-requirements.txt
+RUN /usr/local/bin/pip install -r /tmp/cuckoo-requirements.txt
+
+COPY cuckoo/distributed/requirements.txt /tmp/distributed-requirements.txt
+RUN /usr/local/bin/pip install -r /tmp/distributed-requirements.txt
+
 COPY cuckoo /cuckoo/
 
-RUN echo "Cloning Cuckoo Sandbox..." \
-  && groupadd cuckoo \
-  && useradd -d /cuckoo -M -g cuckoo cuckoo \
-  && useradd -d /cuckoo -M -g cuckoo cuckoo-run \
-  && cd /cuckoo \
-  && echo "Upgrade pip and install pip dependencies..." \
-  && /usr/local/bin/pip install -r requirements.txt \
-  && /usr/local/bin/pip install -r distributed/requirements.txt \
-  && python utils/community.py -waf
+RUN groupadd cuckoo \
+ && useradd -d /cuckoo -M -g cuckoo cuckoo \
+ && useradd -d /cuckoo -M -g cuckoo cuckoo-run \
+ && cd /cuckoo \
+ && python utils/community.py -waf
 
 RUN echo "Clean up unnecessary files..." \
-  && apt-get purge -y --auto-remove $buildDeps \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/lib/mongodb
+ && apt-get purge -y --auto-remove $buildDeps \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/lib/mongodb
 
 VOLUME ["/cuckoo/conf", "/root/.vmcloak"]
 
